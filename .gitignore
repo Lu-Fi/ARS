@@ -1,0 +1,15 @@
+﻿################################################################################
+# Diese .gitignore-Datei wurde von Microsoft(R) Visual Studio automatisch erstellt.
+################################################################################
+
+bin/
+obj/
+packages/
+.vs/
+log/*.log
+My\Project/PublishProfiles/
+/My Project/PublishProfiles
+Web.config
+Web.Debug.config
+Web.Release.config
+azure-pipelines.yml

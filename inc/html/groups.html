@@ -1,0 +1,63 @@
+﻿
+<div class="pt-3 pb-2 border-bottom arsUserInfo mb-3">
+    <h2 id="chUserName"></h2>
+    <div id="chUserInfo"></div>
+    <button class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></button>
+</div>
+
+<div class="arsCsw">
+    <div class="arsManagedAccounts border-bottom arsMembershipBox">
+        <h5>Managed Accounts</h5>
+        <div class="table-responsive arsMembershipTable">
+            <table id="arsAssUsr" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="arsRequestableGroups arsMembershipBox">
+        <h5>Requestable Permissions for <span id="arsActiveUserName">&lt;select Managed Account&gt;</span></h5>
+        <div class="table-responsive arsMembershipTable">
+            <table id="arsAssGrp" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Base group</th>
+                        <th scope="col">Expire</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<template id="arsTimeSelect">
+    <select class="form-select form-select-sm">
+        <option value="1">15 Minutes</option>
+        <option value="2">1 Hour</option>
+        <option value="3" selected>2 Hours</option>
+        <option value="4">4 Hours</option>
+        <option value="5">8 Hours</option>
+    </select>
+</template>
+
+<template id="tplSwitch">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox">
+    </div>
+</template>
+
+<template id="arsButton">
+    <button class="btn btn-outline-secondary btn-sm" type="button"></button>
+</template>

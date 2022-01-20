@@ -1,0 +1,54 @@
+﻿<div class="arsCsw accounts">
+
+    <div class="border-bottom arsAccountsInfo mb-3">
+        <i class="bi-person"></i>
+        <h2>Accounts</h2>
+        <button class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></button>
+    </div>
+
+    <div class="col-sm-12 float-start">
+        <div class="card m-1">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">&nbsp;</h6>
+            </div>
+            <div class="card-body pb-1">
+                <table id="UsrTbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Ars-User</th>
+                            <th scope="col">Ars-Admin</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-secondary float-end mb-1 btn-sm" id="btnAddUsr">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="tplButton">
+    <button class="btn btn-outline-secondary btn-sm" type="button"></button>
+</template>
+
+<template id="tplSwitch">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox">
+    </div>
+</template>
+
+<template id="tplSearch">
+    <div class="input-group my-4">
+        <input type="text" id="arsSearchAdd" class="form-control typeahead" data-provide="typeahead" placeholder="Search Active Directory" data-sid="" data-type="">
+        <button class="btn btn-outline-secondary" type="button" disabled>Search<i class="bi bi-search ms-1"></i></button>
+    </div>
+</template>
+
+<template id="tplConfirmRemove">
+    This will remove the account and all related assignments in ARS.<br />
+    Are you sure to remove this account ?
+</template>

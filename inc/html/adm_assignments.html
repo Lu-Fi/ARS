@@ -1,0 +1,211 @@
+﻿<div class="input-group my-4">
+    <input type="text" id="arsSearch" class="form-control typeahead" data-provide="typeahead" placeholder="Search Active Directory user or group" data-sid="" data-type="">
+    <button class="btn btn-outline-secondary" type="button" disabled>Search<i class="bi bi-search ms-1"></i></button>
+</div>
+
+<div class="arsCsw admin">
+</div>
+
+<template id="tplUser">
+
+    <div class="border-bottom arsUserInfo mb-3">
+        <i class="bi-person"></i>
+        <h2 id="chUserName"></h2>
+        <div id="chUserInfo"></div>
+        <button class="btn btn-outline-secondary" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
+    </div>
+
+    <div class="col-sm-6 float-start">
+        <div class="card m-1">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Manages:</h6>
+            </div>
+            <div class="card-body pb-1">
+                <table id="AssUsrTbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-secondary float-end mb-1 btn-sm" id="btnAddAssUsr">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-6 float-start">
+        <div class="card m-1">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Managed by:</h6>
+            </div>
+            <div class="card-body pb-1">
+                <table id="UsrTbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-secondary float-end mb-1 btn-sm" id="btnAddUsr">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12 float-start">
+        <div class="card m-1">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Can request:</h6>
+            </div>
+            <div class="card-body pb-1">
+                <table id="AssGrpTbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-secondary float-end mb-1 btn-sm" id="btnAddAssGrp">Add</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="tplGroup">
+
+    <div class="border-bottom arsUserInfo mb-3">
+        <i class="bi-people"></i>
+        <h2 id="chGroupName"></h2>
+        <div id="chGroupInfo"></div>
+        <button class="btn btn-outline-secondary" id="btnRefresh"><i class="bi bi-arrow-clockwise"></i></button>
+    </div>
+
+    <div class="col-sm-12 float-start">
+        <div class="card m-1">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Can be requested by the following accounts</h6>
+            </div>
+            <div class="card-body pb-1">
+                <table id="UsrTbl" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-secondary float-end mb-1 btn-sm" id="btnAddAssGrp">Add</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="tplAdvancedOptions">
+
+    <div class="col-sm-12">
+        <div class="card mb-2">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title float-start">Automatic Account disable</h6>
+                <div class="form-check form-switch float-end">
+                    <input class="form-check-input float-end" type="checkbox" data-option="8" title="Disallow the account manager to set this option.">
+                </div><span class="float-end">lock option</span>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    If this option is enabled, the account will be automatically deactivated once all group memberships in ARS associated with this account have expired.The left button enables/disables and the right button allows/disallows the assigned user of the account to use this option.
+                </div>
+                <div class="form-check form-switch float-start">
+                    <input class="form-check-input" type="checkbox" data-option="4" title="Enable or disable this option.">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="card mb-2">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title float-start">Automatic Password reset</h6>
+                <div class="form-check form-switch float-end">
+                    <input class="form-check-input float-end" type="checkbox" data-option="32" title="Disallow the account manager to set this option.">
+                </div><span class="float-end">lock option</span>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    This option resets the account password once all group memberships in ARS associated with this account have expired. The left button enables/disables and the right button allows/disallows the assigned user of the account to use this option.
+                </div>
+                <div class="form-check form-switch float-start">
+                    <input class="form-check-input" type="checkbox" data-option="16" title="Enable or disable this option.">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="card mb-2">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title float-start">Reset Password</h6>
+                <div class="form-check form-switch float-end">
+                    <input class="form-check-input float-end" type="checkbox" data-option="64" title="Disallow the account manager to set this option.">
+                </div><span class="float-end">lock option</span>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    A new password will be created and set for this account. This password is randomly generated. The right switch will remove this option for the current account user assignement.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary float-start mb-2">reset password</button>
+            </div>
+        </div>
+    </div>
+
+</template>
+
+<template id="tplSwitch">
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox">
+    </div>
+</template>
+
+<template id="tplButton">
+    <button class="btn btn-outline-secondary btn-sm" type="button"></button>
+</template>
+
+<template id="tplSearch">
+    <div class="input-group my-4">
+        <input type="text" id="arsSearchAdd" class="form-control typeahead" data-provide="typeahead" placeholder="Search Active Directory" data-sid="" data-type="">
+        <button class="btn btn-outline-secondary" type="button" disabled>Search<i class="bi bi-search ms-1"></i></button>
+    </div>
+</template>
+
+<template id="tplAddResult">
+    This account is curently not configured or disabled in ARS,
+    do you want to add or enable this account ?
+</template>
+
+<template id="tplArsPw">
+    <div class="input-group my-4" id="arsPwIg">
+        <label class="input-group-text">New password:</label>
+        <input type="password" class="form-control" disabled>
+        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-eye-slash ms-1"></i></button>
+    </div>
+</template>
+
+<template id="tplGroupType">
+    <select class="form-select form-select-sm">
+        <option value="1">base</option>
+        <option value="2">optional</option>
+    </select>
+</template>

@@ -1,0 +1,96 @@
+﻿<div class="pt-3 pb-2 border-bottom arsUserInfo mb-3">
+    <h2 id="chUserName"></h2>
+    <div id="chUserInfo"></div>
+    <button class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></button>
+</div>
+
+<div class="arsCsw">
+    <div class="arsManagedAccounts border-bottom arsMembershipBox">
+        <h6>Managed Accounts</h6>
+        <div class="table-responsive arsMembershipTable">
+            <table id="arsAssUsr" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h5 class="mb-3">Advanced Options for <span id="arsActiveUserName"></span><br /></h5>
+    <div id="arsCwAdvancedOptions">
+    </div>
+</div>
+
+<template data-option="8">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Automatic Account disable</h6>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    The account will be automatically deactivated when the last time-bound group membership expires.
+                    Disabling the account reduces attacks on unclosed login sessions.
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" data-option="4" data-id="413b596d-b0af-41a2-909f-0670a2771a32">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template data-option="32">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Automatic Password reset</h6>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    When the account is automatically deactivated, the password for the account is also reset.
+                    Resetting the password will invalidate cached password hashes. This prevents misuse of cached hashes.
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" data-option="16" data-id="b8a6b63b-905b-4fd4-82d6-83adb8b419be">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template data-option="64">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header pt-1 pb-0">
+                <h6 class="card-title">Reset Password</h6>
+            </div>
+            <div class="card-body pb-1">
+                <div class="mb-3">
+                    A new password will be created and set for this Account. This Password is randomly generated.
+                    Caused by security rules, a mfa authentication is required to reset and view the new password.
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" data-id="927cbd15-c1e5-4f00-85ee-431f49914b16">reset password</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="arsButton">
+    <button class="btn btn-outline-secondary btn-sm" type="button"></button>
+</template>
+
+<template id="tplArsPw">
+    <div class="input-group my-4" id="arsPwIg">
+        <label class="input-group-text">New password:</label>
+        <input type="password" class="form-control" disabled>
+        <button class="btn btn-outline-secondary" type="button"><i class="bi bi-eye-slash ms-1"></i></button>
+    </div>
+</template>
