@@ -14,3 +14,4 @@ Web.Debug.config
 Web.Release.config
 azure-pipelines.yml
 *.vbproj.user
+*.user
