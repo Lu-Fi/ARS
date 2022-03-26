@@ -7,7 +7,7 @@ Namespace Ars
 
     Public Class AssignmentFlags
 
-        Public flags As Integer
+        Public Flags As Integer
 
         Public ReadOnly Property IsUser As Integer
             Get
@@ -159,7 +159,8 @@ Namespace Ars
 
                 ldap.LoadLdapUser(_AssignedUsers)
 
-                Return _AssignedUsers
+                Return _AssignedUsers.FindAll(
+                                    Function(a) a.Name IsNot Nothing)
             End Get
         End Property
 
@@ -1626,7 +1627,8 @@ Namespace Ars
                     User.ldap.LoadLdapGroup(_AssignedGroups)
                 End If
 
-                Return _AssignedGroups
+                Return _AssignedGroups.FindAll(
+                                    Function(a) a.Name IsNot Nothing)
             End Get
         End Property
 

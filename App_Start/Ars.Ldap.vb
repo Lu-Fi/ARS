@@ -504,6 +504,7 @@ Namespace Ars
             Dim lBolAddAssignments As Boolean =
                 False
 
+            'Normally _processedGroups is passed if this function is called recursive
             If _processedGroups Is Nothing Then
 
                 _processedGroups = New List(Of Object)
@@ -1062,7 +1063,7 @@ Namespace Ars
 
             Dim lLngResult As Long = 0
             Dim lObjReader As SqlDataReader =
-            lObjSqlCommand.ExecuteReader()
+                lObjSqlCommand.ExecuteReader()
 
             While lObjReader.Read()
 
