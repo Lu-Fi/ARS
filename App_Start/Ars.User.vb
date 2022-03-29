@@ -373,122 +373,130 @@ Namespace Ars
                     'Get User from LDAP
                     ldap.RefreshUserFromLdap(Me)
 
-                    lIntlastRefresh =
+                    If Me.Name IsNot Nothing Then
+
+                        lIntlastRefresh =
                         (Now() - AdAssignmentTimestamp).TotalSeconds
 
-                    ml.write(LOGLEVEL.DEBUG,
-                        String.Format("The last assignment refresh was less than {0} seconds ago.", lIntlastRefresh))
+                        ml.write(LOGLEVEL.DEBUG,
+                            String.Format("The last assignment refresh was less than {0} seconds ago.", lIntlastRefresh))
 
-                    'Check Access by Active Directory Group
-                    If ApplicationSettings.AccessGroupRegex IsNot Nothing Then
+                        'Check Access by Active Directory Group
+                        If ApplicationSettings.AccessGroupRegex IsNot Nothing Then
 
-                        With Me.memberOf.FindIndex(
-                            Function(g) Regex.IsMatch(g.ToString(), ApplicationSettings.AccessGroupRegex))
+                            With Me.memberOf.FindIndex(
+                                Function(g) Regex.IsMatch(g.ToString(), ApplicationSettings.AccessGroupRegex))
 
-                            If Not .Equals(-1) Then
+                                If Not .Equals(-1) Then
 
-                                lBolAssignedByGroup = True
-                            End If
-                        End With
-                    End If
-
-                    'Set UpdateId for all existing Assignments, this is needed to find 
-                    'assignments no longer valid 
-                    updateId += 1
-
-                    'Get User from database
-                    If Not SqlConnection.State = ConnectionState.Open Then
-
-                        SqlConnection.Open()
-                    End If
-
-                    Dim lObjSqlCommand As New SqlCommand(
-                            "SELECT TOP(1) * FROM [ars_users] WHERE [uSID] = @uSID",
-                            SqlConnection)
-
-                    lObjSqlCommand.Parameters.AddWithValue("uSID", SID)
-
-                    Dim lObjReader As SqlDataReader = lObjSqlCommand.ExecuteReader()
-
-                    If lObjReader.HasRows Then
-
-                        While lObjReader.Read()
-
-                            flags = lObjReader.GetInt32(1)
-                        End While
-                    Else
-
-                        If lBolAssignedByGroup = True Then
-
-                            flags = USER_FLAG.ACTIVE Or USER_FLAG.ASSIGNED_BY_GROUP
+                                    lBolAssignedByGroup = True
+                                End If
+                            End With
                         End If
-                    End If
 
-                    lObjReader.Close()
+                        'Set UpdateId for all existing Assignments, this is needed to find 
+                        'assignments no longer valid 
+                        updateId += 1
 
-                    'Load user assignments from database
-                    lObjSqlCommand.CommandText =
-                    "SELECT [aID], [uSID], [aSID], [flag] FROM [ars_assignments] WHERE
+                        'Get User from database
+                        If Not SqlConnection.State = ConnectionState.Open Then
+
+                            SqlConnection.Open()
+                        End If
+
+                        Dim lObjSqlCommand As New SqlCommand(
+                                "SELECT TOP(1) * FROM [ars_users] WHERE [uSID] = @uSID",
+                                SqlConnection)
+
+                        lObjSqlCommand.Parameters.AddWithValue("uSID", SID)
+
+                        Dim lObjReader As SqlDataReader = lObjSqlCommand.ExecuteReader()
+
+                        If lObjReader.HasRows Then
+
+                            While lObjReader.Read()
+
+                                flags = lObjReader.GetInt32(1)
+                            End While
+                        Else
+
+                            If lBolAssignedByGroup = True Then
+
+                                flags = USER_FLAG.ACTIVE Or USER_FLAG.ASSIGNED_BY_GROUP
+                            End If
+                        End If
+
+                        lObjReader.Close()
+
+                        'Load user assignments from database
+                        lObjSqlCommand.CommandText =
+                        "SELECT [aID], [uSID], [aSID], [flag] FROM [ars_assignments] WHERE
                         uSID = @uSID Or 
 	                    uSID in (SELECT aSID FROM [ars_assignments] WHERE uSID = @uSID)"
 
-                    Dim lObjDt As New DataTable
-                    lObjDt.Load(lObjSqlCommand.ExecuteReader())
+                        Dim lObjDt As New DataTable
+                        lObjDt.Load(lObjSqlCommand.ExecuteReader())
 
-                    _Assignments.RemoveAll(
-                        Function(a) a.source = ASS_SOURCE.SQL)
-
-                    For Each lObjRow In lObjDt.Rows
-
-                        If (CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT) = True Or
-                        CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.GROUP_ASSIGNMENT) = True) And
-                        CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT) = False Then
-
-                            _Assignments.Add(New Assignment With {
-                                .aID = lObjRow(0),
-                                .uSID = lObjRow(1),
-                                .aSID = lObjRow(2),
-                                .source = ASS_SOURCE.SQL,
-                                .flags = lObjRow(3),
-                                .updateId = updateId
-                            })
-                        End If
-                    Next
-
-                    lObjReader.Close()
-                    lObjSqlCommand.Dispose()
-                    SqlConnection.Close()
-
-                    'Load user assignments from ActiveDirectory
-                    If (lIntlastRefresh > ApplicationSettings.AdAssignmentRefreshSeconds) Or
-                        UpdateRoleGroups = True Or forceUpdate = True Then
-
-                        '_Assignments.RemoveAll(
-                        'Function(a) a.source = ASS_SOURCE.LDAP)
-
-                        ldap.GetLdapUserAssignments(Me)
-                        ldap.GetLdapGroupAssignments(Me)
-
-                        AdAssignmentTimestamp = Now()
-
-                        'Remove all assignments not updated
                         _Assignments.RemoveAll(
-                            Function(a) a.updateId > 0 And a.updateId < updateId)
-                    End If
+                            Function(a) a.source = ASS_SOURCE.SQL)
 
-                    For Each lObjRow In lObjDt.Rows
+                        For Each lObjRow In lObjDt.Rows
 
-                        If CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT) = True Then
+                            If (CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT) = True Or
+                            CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.GROUP_ASSIGNMENT) = True) And
+                            CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT) = False Then
 
-                            _Assignments.FindAll(
-                            Function(a) a.uSID = lObjRow(1) And a.aSID = lObjRow(2) And a.source = ASS_SOURCE.LDAP).ForEach(
-                                Sub(a)
-                                    a.aID = lObjRow(0)
-                                    a.flags = lObjRow(3)
-                                End Sub
-                        )
+                                _Assignments.Add(New Assignment With {
+                                    .aID = lObjRow(0),
+                                    .uSID = lObjRow(1),
+                                    .aSID = lObjRow(2),
+                                    .source = ASS_SOURCE.SQL,
+                                    .flags = lObjRow(3),
+                                    .updateId = updateId
+                                })
+                            End If
+                        Next
+
+                        lObjReader.Close()
+                        lObjSqlCommand.Dispose()
+                        SqlConnection.Close()
+
+                        'Load user assignments from ActiveDirectory
+                        If (lIntlastRefresh > ApplicationSettings.AdAssignmentRefreshSeconds) Or
+                            UpdateRoleGroups = True Or forceUpdate = True Then
+
+                            '_Assignments.RemoveAll(
+                            'Function(a) a.source = ASS_SOURCE.LDAP)
+
+                            ldap.GetLdapUserAssignments(Me)
+                            ldap.GetLdapGroupAssignments(Me)
+
+                            AdAssignmentTimestamp = Now()
+
+                            'Remove all assignments not updated
+                            _Assignments.RemoveAll(
+                                Function(a) a.updateId > 0 And a.updateId < updateId)
                         End If
-                    Next
+
+                        For Each lObjRow In lObjDt.Rows
+
+                            If CInt(lObjRow(3)).arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT) = True Then
+
+                                _Assignments.FindAll(
+                                Function(a) a.uSID = lObjRow(1) And a.aSID = lObjRow(2) And a.source = ASS_SOURCE.LDAP).ForEach(
+                                    Sub(a)
+                                        a.aID = lObjRow(0)
+                                        a.flags = lObjRow(3)
+                                    End Sub
+                            )
+                            End If
+                        Next
+
+                    Else
+
+                        ml.write(LOGLEVEL.INFO,
+                            String.Format("User does not exists in AD: ({0})", Me.SID))
+                    End If
                 End If
             Catch ex As Exception
 
