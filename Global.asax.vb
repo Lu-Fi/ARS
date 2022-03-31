@@ -9,6 +9,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
 
     Private _state As Integer = 0
     Private _worker As Thread = Nothing
+    Private _OrphanSidWorker As Thread = Nothing
 
     Private _users As New List(Of Ars.AssignedUser)
     Private _groups As New List(Of Object)
@@ -105,6 +106,9 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
         Dim _loop As Integer =
             ApplicationSettings.BackgroundWorkerSeconds
 
+
+        Dim _OrphanSidLastRunDay As Integer = 0
+
         While _state = 1
 
             Thread.Sleep(1000)
@@ -115,6 +119,23 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
 
                 _loop = 0
                 DisableAndReset()
+            End If
+
+            If _OrphanSidLastRunDay < Now().DayOfYear And ApplicationSettings.OrphanSidRemovalDays > 0 Then
+
+                'Ensure no other thread is running
+                If _OrphanSidWorker IsNot Nothing Then
+
+                    If _OrphanSidWorker.IsAlive Then
+
+                        _OrphanSidWorker.Abort()
+                    End If
+                End If
+
+                _OrphanSidWorker = New Thread(AddressOf CleanupOrphanSidList)
+                _OrphanSidWorker.Start()
+
+                _OrphanSidLastRunDay = Now().DayOfYear
             End If
         End While
 
@@ -151,7 +172,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                 .aID = lObjRow(0),
                 .uSID = lObjRow(1),
                 .aSID = lObjRow(2),
-                .flags = lObjRow(3)
+                .Flags = lObjRow(3)
             }
 
                 If _Assignment.IsUser Then
@@ -161,7 +182,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                         _users.Add(
                         New Ars.AssignedUser With {
                             .SID = _Assignment.aSID,
-                            .flags = _Assignment.flags
+                            .Flags = _Assignment.Flags
                         })
 
                         lLstSids.Add(_Assignment.aSID)
@@ -215,7 +236,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                 Else
 
                     If _users_processed(_user.SID).UAC <> _user.UAC Or
-                   _users_processed(_user.SID).flags <> _user.flags Or
+                   _users_processed(_user.SID).Flags <> _user.Flags Or
                    _users_processed(_user.SID).pwdLastSet > _user.pwdLastSet Or
                    _users_processed(_user.SID).pwdLastSet = 0 Then
 
@@ -255,4 +276,159 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
         ml.done()
     End Sub
 
+    Public Sub CleanupOrphanSidList()
+
+        Dim ml As New Ars.MethodLogger("Global.asax")
+
+        Try
+
+            If Not SqlConnection.State = ConnectionState.Open Then
+
+                SqlConnection.Open()
+            End If
+
+            'First check all known orphan SID's again
+            Dim lObjOrphanSidsDt As New DataTable
+            With New SqlCommand(
+                        "SELECT * FROM [ars_orphansids]",
+                        SqlConnection)
+                lObjOrphanSidsDt.Load(.ExecuteReader())
+                .Dispose()
+            End With
+
+            For Each lObjRow In lObjOrphanSidsDt.Rows
+                Try
+
+                    With New SecurityIdentifier(lObjRow(0).ToString()).Translate(GetType(NTAccount))
+
+                        ml.write(Ars.LOGLEVEL.DEBUG,
+                            String.Format("Remove SID from orphan SID table, {0} ({1})", lObjRow(0).ToString(), .ToString()))
+
+                        With New SqlCommand(
+                                    "DELETE FROM [ars_orphansids] WHERE [oSID] = @SID", SqlConnection)
+                            .Parameters.AddWithValue("SID", lObjRow(0).ToString())
+                            .ExecuteNonQuery()
+                            .Dispose()
+                        End With
+                    End With
+                Catch ex As Exception
+                End Try
+            Next
+
+            lObjOrphanSidsDt.Dispose()
+
+            'Check all SID's and write unresolvable into DB
+            Dim lObjAllSidsDt As New DataTable
+            With New SqlCommand("
+                        WITH T1 AS ( 
+                          SELECT [uSID] AS _SID FROM [ars_assignments]
+                          UNION ALL
+                          SELECT [aSID] AS _SID FROM [ars_assignments]
+                          UNION ALL
+                          SELECT [uSID] AS _SID FROM [ars_user]
+                          UNION ALL
+                          SELECT [uSID] AS _SID FROM [ars_users]
+                        ) SELECT * FROM T1 GROUP BY _SID",
+                        SqlConnection)
+
+                lObjAllSidsDt.Load(.ExecuteReader())
+                .Dispose()
+            End With
+
+            For Each lObjRow In lObjAllSidsDt.Rows
+                Try
+
+                    With New SecurityIdentifier(lObjRow(0).ToString()).Translate(GetType(NTAccount))
+
+                        ml.write(Ars.LOGLEVEL.DEBUG,
+                            String.Format("{0} = {1}", lObjRow(0).ToString(), .ToString()))
+                    End With
+                Catch ex As Exception
+
+                    With New SqlCommand(
+                                "IF NOT EXISTS ( SELECT [oSID] FROM [ars_orphansids] WHERE [oSID] = @SID )
+                                 BEGIN
+                                   INSERT INTO [ars_orphansids] (oSID, ts) VALUES (@SID, GetDate()) 
+                                 END",
+                                SqlConnection)
+                        .Parameters.AddWithValue("SID", lObjRow(0).ToString())
+                        .ExecuteNonQuery()
+                        .Dispose()
+                    End With
+
+                    ml.write(Ars.LOGLEVEL.DEBUG,
+                        String.Format("OrphanSid = {0}", lObjRow(0).ToString()))
+                End Try
+            Next
+
+            lObjAllSidsDt.Dispose()
+
+            'log if something will be deleted
+            Dim lObjDataReader As SqlClient.SqlDataReader
+
+            With New SqlCommand(
+                                "SELECT * FROM [ars_assignments] 
+	                               WHERE 
+		                             EXISTS (SELECT * FROM [ars_orphansids] WHERE ( [oSID] = [uSID] OR [oSID] = [aSID] ) AND [ts] < DATEADD(day, @DAYS, GETDATE()));",
+                                SqlConnection)
+                .Parameters.AddWithValue("DAYS", -ApplicationSettings.OrphanSidRemovalDays)
+                lObjDataReader = .ExecuteReader()
+                While lObjDataReader.Read()
+
+                    ml.write(Ars.LOGLEVEL.INFO,
+                        String.Format("Orpan SID removed from [ars_assignments], aID: {0}, uSID: {1}, aSID: {2}, flags: {3}", lObjDataReader.Item(0), lObjDataReader.Item(1), lObjDataReader.Item(2), lObjDataReader.Item(3)))
+                End While
+                lObjDataReader.Close()
+                .Dispose()
+            End With
+
+            With New SqlCommand(
+                                "SELECT * FROM [ars_users] 
+	                               WHERE 
+		                             EXISTS (SELECT * FROM [ars_orphansids] WHERE [oSID] = [uSID] AND [ts] < DATEADD(day, @DAYS, GETDATE()))",
+                                SqlConnection)
+                .Parameters.AddWithValue("DAYS", -ApplicationSettings.OrphanSidRemovalDays)
+                lObjDataReader = .ExecuteReader()
+                While lObjDataReader.Read()
+
+                    ml.write(Ars.LOGLEVEL.INFO,
+                        String.Format("Orpan SID removed from [ars_users], uSID: {0}, flags: {1}", lObjDataReader.Item(0), lObjDataReader.Item(1)))
+                End While
+                lObjDataReader.Close()
+                .Dispose()
+            End With
+
+            'Delete outdated orphan SID's 
+            With New SqlCommand(
+                                "DELETE FROM [ars_assignments] 
+	                               WHERE 
+		                             EXISTS (SELECT * FROM [ars_orphansids] WHERE ( [oSID] = [uSID] OR [oSID] = [aSID] ) AND [ts] < DATEADD(day, @DAYS, GETDATE()));
+                                 DELETE FROM [ars_user] 
+	                               WHERE 
+		                             EXISTS (SELECT * FROM [ars_orphansids] WHERE [oSID] = [uSID] AND [ts] < DATEADD(day, @DAYS, GETDATE()));
+                                 DELETE FROM [ars_users] 
+	                               WHERE 
+		                             EXISTS (SELECT * FROM [ars_orphansids] WHERE [oSID] = [uSID] AND [ts] < DATEADD(day, @DAYS, GETDATE()));
+                                 
+                                 DELETE FROM [ars_orphansids] WHERE [ts] < DATEADD(day, @DAYS, GETDATE());",
+                                SqlConnection)
+                .Parameters.AddWithValue("DAYS", -ApplicationSettings.OrphanSidRemovalDays)
+                .ExecuteNonQuery()
+                .Dispose()
+            End With
+
+            SqlConnection.Close()
+        Catch ex As Exception
+
+            If Not SqlConnection.State = ConnectionState.Closed Then
+
+                SqlConnection.Close()
+            End If
+
+            ml.write(Ars.LOGLEVEL.ERR, ex.Message)
+            ml.write(Ars.LOGLEVEL.ERR, ex.StackTrace)
+        End Try
+
+        ml.done()
+    End Sub
 End Class
