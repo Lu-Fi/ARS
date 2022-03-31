@@ -50,3 +50,112 @@ Actually, at this point you can already assume that if 0,1,2 administrative righ
 ![screen_2](https://user-images.githubusercontent.com/1177251/150324137-461cc29b-b9bf-4859-b256-8d17a2ccd4f5.png)
 ![screen_3](https://user-images.githubusercontent.com/1177251/150324139-d9572ce4-4ac5-4762-8272-5c90ab98f8b1.png)
 ![screen_4](https://user-images.githubusercontent.com/1177251/150324143-545afd3b-8fa4-4894-930f-fd0643120d57.png)
+
+
+# Autostart with IIS
+
+c:\windows\system32\inetsrv\config\applicationHost.config
+
+    <applicationPools>
+        <add name="ARS" autoStart="true" managedRuntimeVersion="v4.0" startMode="AlwaysRunning">
+            <processModel identityType="SpecificUser" userName="DOMAIN\USER" password="" loadUserProfile="false" idleTimeout="00:00:00" maxProcesses="0" />
+            <recycling>
+                <periodicRestart time="00:00:00">
+                    <schedule>
+                        <clear />
+                    </schedule>
+                </periodicRestart>
+            </recycling>
+        </add>
+    </applicationPools>
+
+    <sites>
+        <site name="ARS" id="2" serverAutoStart="true">
+            <application path="/" applicationPool="ARS" preloadEnabled="true">
+                <virtualDirectory path="/" physicalPath="C:\inetpub\wwwroot\ARS" />
+            </application>
+            <bindings>
+                <binding protocol="https" bindingInformation="*:443:ars.domain.net" sslFlags="0" />
+            </bindings>
+        </site>
+    </sites>
+
+    <location path="ARS">
+        <system.webServer>
+            <security>
+                <authentication>
+                    <windowsAuthentication enabled="true" useKernelMode="false">
+                        <extendedProtection tokenChecking="None" />
+                        <providers>
+                            <clear />
+                            <add value="Negotiate:Kerberos" />
+                        </providers>
+                    </windowsAuthentication>
+                    <anonymousAuthentication enabled="false" />
+                </authentication>
+                <access sslFlags="Ssl" />
+            </security>
+        </system.webServer>
+    </location>
+
+
+https://docs.microsoft.com/en-us/iis/get-started/whats-new-in-iis-8/iis-80-application-initialization
+
+
+# SQL Scheme
+(Create empty DB called "**Ars**" first)
+
+    USE [Ars]
+    GO
+
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    CREATE TABLE [dbo].[ars_assignments](
+      [aID] [uniqueidentifier] NOT NULL,
+      [uSID] [varchar](256) NOT NULL,
+      [aSID] [varchar](256) NOT NULL,
+      [flag] [int] NOT NULL
+    ) ON [PRIMARY]
+    GO
+
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    CREATE TABLE [dbo].[ars_audit](
+      [aSID] [varchar](256) NOT NULL,
+      [aName] [varchar](256) NOT NULL,
+      [uSource] [varchar](128) NULL,
+      [uName] [varchar](256) NOT NULL,
+      [action] [varchar](256) NOT NULL,
+      [result] [int] NOT NULL,
+      [ts] [datetime] NULL
+    ) ON [PRIMARY]
+    GO
+
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    CREATE TABLE [dbo].[ars_user](
+      [uSID] [varchar](256) NOT NULL,
+      [pwdLastSet] [bigint] NULL
+    ) ON [PRIMARY]
+    GO
+
+    SET ANSI_NULLS ON
+    GO
+    SET QUOTED_IDENTIFIER ON
+    GO
+    CREATE TABLE [dbo].[ars_users](
+      [uSID] [varchar](256) NOT NULL,
+      [flag] [int] NOT NULL
+    ) ON [PRIMARY]
+    GO
+    ALTER TABLE [dbo].[ars_assignments] ADD  CONSTRAINT [DF_ars_assignments_aID]  DEFAULT (newid()) FOR [aID]
+    GO
+    ALTER TABLE [dbo].[ars_users] ADD  CONSTRAINT [DF_ars_users_flag]  DEFAULT ((0)) FOR [flag]
+    GO
+
