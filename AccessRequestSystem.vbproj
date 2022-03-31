@@ -207,7 +207,6 @@
     <Content Include="inc\html\adm_accounts.html" />
     <Content Include="inc\html\adm_assignments.html" />
     <Content Include="inc\html\adm_audit.html" />
-    <Content Include="inc\html\adm_maintenance.html" />
     <Content Include="inc\html\advanced.html" />
     <Content Include="inc\html\audit.html" />
     <Content Include="inc\html\log.html" />

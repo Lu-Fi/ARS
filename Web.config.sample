@@ -13,29 +13,19 @@
     <add key="ldap_UserSearchBase" value="<LDAP USER SEARCHBASE>" />
     <add key="ldap_GroupSearchBase" value="<LDAP GROUP SEARCHBASE>" />
     <add key="ldap_SearchLimit" value="20" />
-    
-    <!-- 1...x -->
+    <!-- 8...x -->
     <add key="ldap_UserCacheSeconds" value="3600" />
-    
     <!-- 1...x -->
     <add key="ldap_GroupCacheSeconds" value="21600" />
-    
     <!-- 1...x -->
     <add key="Ad_AssignmentRefreshSeconds" value="3600" />
-    
-    <!-- 1...x (0 = disabled)-->
-    <add key="app_OrphanSidRemovalDays" value ="60" />
-    
-    <!-- 8...x -->
+    <!-- 60...x -->
     <add key="pwd_Length" value="24" />
     <add key="pwd_SpecialCharacters" value="4" />
-    
-    <!-- 60...x -->
     <add key="app_BackgroundWorkerSeconds" value="3600" />
-    
-    <!-- 0..3 -->    
+    <!-- 60...x -->
     <add key="app_logLevel" value="3" />
-    
+    <!-- 0..3 -->
     <add key="app_accessgroup_regex" value="<LDAP ENABLEMENT GROUP>,.*" />
   </appSettings>
   <system.web>

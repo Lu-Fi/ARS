@@ -26,7 +26,6 @@ Namespace Ars
         Public AdAssignmentRefreshSeconds As Integer = 60
 
         Public BackgroundWorkerSeconds As Integer = 60
-        Public OrphanSidRemovalDays As Integer = 1
 
         Public LdapGroupAttributes As String() =
             {"name", "description", "info", "distinguishedname", "objectSid", "managedBy", "managedObjects"}
@@ -68,17 +67,6 @@ Namespace Ars
                     If ConfigurationManager.AppSettings.Item("app_BackgroundWorkerSeconds") > BackgroundWorkerSeconds Then
 
                         BackgroundWorkerSeconds = ConfigurationManager.AppSettings.Item("app_BackgroundWorkerSeconds")
-                    End If
-                End If
-            End If
-
-            If ConfigurationManager.AppSettings.AllKeys.Contains("app_OrphanSidRemovalDays") Then
-
-                If IsNumeric(ConfigurationManager.AppSettings.Item("app_OrphanSidRemovalDays")) Then
-
-                    If ConfigurationManager.AppSettings.Item("app_OrphanSidRemovalDays") > OrphanSidRemovalDays Then
-
-                        OrphanSidRemovalDays = ConfigurationManager.AppSettings.Item("app_OrphanSidRemovalDays")
                     End If
                 End If
             End If
