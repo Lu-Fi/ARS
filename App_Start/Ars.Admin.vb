@@ -372,7 +372,7 @@ Namespace Ars
 
                         _Accounts.Add(New AssignedUser With {
                             .SID = lObjReader.GetString(0),
-                            .Flags = lObjReader.GetInt32(1)
+                            .flags = lObjReader.GetInt32(1)
                         })
                     End While
 

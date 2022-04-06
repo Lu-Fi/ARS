@@ -6,54 +6,54 @@ Imports System.DirectoryServices.Protocols
 Namespace Ars
     Public Class AssignmentFlags
 
-        Public Flags As Integer
+        Public flags As Integer
 
         Public ReadOnly Property IsUser As Integer
             Get
 
-                Return Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT)
+                Return flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT)
             End Get
         End Property
 
         Public ReadOnly Property IsGroup As Integer
             Get
 
-                Return Flags.arsIsBitSet(ASS_FLAG.GROUP_ASSIGNMENT)
+                Return flags.arsIsBitSet(ASS_FLAG.GROUP_ASSIGNMENT)
             End Get
         End Property
 
         Public ReadOnly Property IsSetting As Integer
             Get
 
-                Return Flags.arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT)
+                Return flags.arsIsBitSet(ASS_FLAG.SETTINGS_ASSIGNMENT)
             End Get
         End Property
 
         Public ReadOnly Property AutoDisableActive As Integer
             Get
 
-                Return Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_DISABLE_ACTIVE)
+                Return flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_DISABLE_ACTIVE)
             End Get
         End Property
 
         Public ReadOnly Property AutoPasswordActive As Integer
             Get
 
-                Return Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_ACTIVE)
+                Return flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_ACTIVE)
             End Get
         End Property
 
         Public ReadOnly Property IsAdmin As Integer
             Get
 
-                Return Flags.arsIsBitSet(USER_FLAG.ADMIN)
+                Return flags.arsIsBitSet(USER_FLAG.ADMIN)
             End Get
         End Property
 
         Public ReadOnly Property AssignedByGroup As Integer
             Get
 
-                Return Flags.arsIsBitSet(USER_FLAG.ASSIGNED_BY_GROUP)
+                Return flags.arsIsBitSet(USER_FLAG.ASSIGNED_BY_GROUP)
             End Get
         End Property
     End Class
@@ -131,7 +131,7 @@ Namespace Ars
 
                 InitializeUser()
 
-                Return Flags.arsIsBitSet(USER_FLAG.ACTIVE)
+                Return flags.arsIsBitSet(USER_FLAG.ACTIVE)
             End Get
         End Property
 
@@ -145,7 +145,7 @@ Namespace Ars
                     _AssignedUsers.Add(New AssignedUser With {
                             .aID = _AssignedUser.aID,
                             .SID = _AssignedUser.aSID,
-                            .Flags = _AssignedUser.Flags,
+                            .flags = _AssignedUser.flags,
                             .source = _AssignedUser.source,
                             .User = Me,
                             ._Assignments =
@@ -188,7 +188,7 @@ Namespace Ars
                             lLstUsers.Add(New AssignedUser With {
                                 .aID = lObjReader.GetGuid(0),
                                 .SID = lObjReader.GetString(1),
-                                .Flags = lObjReader.GetInt32(3)
+                                .flags = lObjReader.GetInt32(3)
                             })
                         End While
 
@@ -413,13 +413,13 @@ Namespace Ars
 
                             While lObjReader.Read()
 
-                                Flags = lObjReader.GetInt32(1)
+                                flags = lObjReader.GetInt32(1)
                             End While
                         Else
 
                             If lBolAssignedByGroup = True Then
 
-                                Flags = USER_FLAG.ACTIVE Or USER_FLAG.ASSIGNED_BY_GROUP
+                                flags = USER_FLAG.ACTIVE Or USER_FLAG.ASSIGNED_BY_GROUP
                             End If
                         End If
 
@@ -448,7 +448,7 @@ Namespace Ars
                                     .uSID = lObjRow(1),
                                     .aSID = lObjRow(2),
                                     .source = ASS_SOURCE.SQL,
-                                    .Flags = lObjRow(3),
+                                    .flags = lObjRow(3),
                                     .updateId = updateId
                                 })
                             End If
@@ -480,7 +480,7 @@ Namespace Ars
                                 Function(a) a.uSID = lObjRow(1) And a.aSID = lObjRow(2) And a.source = ASS_SOURCE.LDAP).ForEach(
                                     Sub(a)
                                         a.aID = lObjRow(0)
-                                        a.Flags = lObjRow(3)
+                                        a.flags = lObjRow(3)
                                     End Sub
                             )
                             End If
@@ -632,7 +632,7 @@ Namespace Ars
             Dim _Assignment As Assignment =
                     _Assignments.FirstOrDefault(Function(i) i.aID.ToString() = _AssignmentId)
 
-            If Not _Assignment.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_RESET_PASSORD_LOCKED) Then
+            If Not _Assignment.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_RESET_PASSORD_LOCKED) Then
 
                 If _Assignment IsNot Nothing Then
 
@@ -673,7 +673,7 @@ Namespace Ars
 
                 If _Assignment IsNot Nothing Then
 
-                    If Not _Assignment.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_DISABLE_LOCKED) Then
+                    If Not _Assignment.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_DISABLE_LOCKED) Then
 
                         Dim lObjSqlCommand As New SqlCommand(
                                         "If NOT EXISTS (SELECT aID FROM [ars_assignments] WHERE aID = @aID )
@@ -727,7 +727,7 @@ Namespace Ars
 
                 If _Assignment IsNot Nothing Then
 
-                    If Not _Assignment.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_LOCKED) Then
+                    If Not _Assignment.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_LOCKED) Then
 
                         Dim lObjSqlCommand As New SqlCommand(
                                         "If NOT EXISTS (Select aID FROM [ars_assignments] WHERE aID = @aID )
@@ -791,7 +791,7 @@ Namespace Ars
 
                 If _Assignment IsNot Nothing Then
 
-                    If Not _Assignment.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_LOCKED) Then
+                    If Not _Assignment.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_AUTO_PASSWORD_LOCKED) Then
 
                         Dim lObjSqlCommand As New SqlCommand(
                                         "If NOT EXISTS (Select aID FROM [ars_assignments] WHERE aID = @aID )
@@ -855,7 +855,7 @@ Namespace Ars
 
             If _AssignedUser IsNot Nothing Then
 
-                If Not _AssignedUser.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_MANUAL_DISABLE_LOCKED) Then
+                If Not _AssignedUser.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_MANUAL_DISABLE_LOCKED) Then
 
                     'ENABLE USER
                     lDicFncResult("result") =
@@ -882,7 +882,7 @@ Namespace Ars
 
             If _AssignedUser IsNot Nothing Then
 
-                If Not _AssignedUser.Flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_MANUAL_DISABLE_LOCKED) Then
+                If Not _AssignedUser.flags.arsIsBitSet(ASS_FLAG.USER_ASSIGNMENT_MANUAL_DISABLE_LOCKED) Then
 
                     'DISABLE USER
                     lDicFncResult("result") =
@@ -1001,7 +1001,7 @@ Namespace Ars
                     _AssignedGroups.Add(New AssignedGroup With {
                                 .aID = _Assignment.aID,
                                 .SID = _Assignment.aSID,
-                                .flags = _Assignment.Flags,
+                                .flags = _Assignment.flags,
                                 .source = _Assignment.source,
                                 .AssignedUser = Me
                             })
@@ -1201,7 +1201,7 @@ Namespace Ars
                             lLstUsers.Add(New AssignedUser With {
                                 .aID = lObjReader.GetGuid(0),
                                 .SID = lObjReader.GetString(1),
-                                .Flags = lObjReader.GetInt32(3)
+                                .flags = lObjReader.GetInt32(3)
                             })
                         End While
 

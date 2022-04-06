@@ -172,7 +172,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                 .aID = lObjRow(0),
                 .uSID = lObjRow(1),
                 .aSID = lObjRow(2),
-                .Flags = lObjRow(3)
+                .flags = lObjRow(3)
             }
 
                 If _Assignment.IsUser Then
@@ -182,7 +182,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                         _users.Add(
                         New Ars.AssignedUser With {
                             .SID = _Assignment.aSID,
-                            .Flags = _Assignment.Flags
+                            .flags = _Assignment.flags
                         })
 
                         lLstSids.Add(_Assignment.aSID)
@@ -236,7 +236,7 @@ Public Class ArsGlobal : Inherits System.Web.HttpApplication
                 Else
 
                     If _users_processed(_user.SID).UAC <> _user.UAC Or
-                   _users_processed(_user.SID).Flags <> _user.Flags Or
+                   _users_processed(_user.SID).flags <> _user.flags Or
                    _users_processed(_user.SID).pwdLastSet > _user.pwdLastSet Or
                    _users_processed(_user.SID).pwdLastSet = 0 Then
 
