@@ -254,7 +254,7 @@ Namespace Ars
             {"user_3", New List(Of String) From {"User.Name", "User.DisplayName", "User.Company", "User.AssignedUsers", "User.aID", "User.Department", "User.Users", "User.AssignedGroups",
                                                  "AssignedUser.Name", "AssignedUser.DisplayName", "AssignedUser.Description", "AssignedUser.aID", "AssignedUser.Company", "AssignedUser.Department", "AssignedUser.SID", "AssignedUser.flags", "AssignedUser.source",
                                                  "AssignedGroup.Name", "AssignedGroup.Description", "AssignedGroup.Type", "AssignedGroup.aID", "AssignedGroup.SID", "AssignedGroup.source"}},
-            {"user_4", New List(Of String) From {"AssignedUser.Name", "AssignedUser.DisplayName", "AssignedUser.Company", "AssignedUser.Department", "AssignedUser.Description", "AssignedUser.flags", "AssignedUser.SID", "AssignedUser.source"}},
+            {"user_4", New List(Of String) From {"AssignedUser.Name", "AssignedUser.DisplayName", "AssignedUser.Company", "AssignedUser.Department", "AssignedUser.Description", "AssignedUser.Flags", "AssignedUser.SID", "AssignedUser.source"}},
             {"group_0", New List(Of String) From {"AssignedGroup.Name", "AssignedGroup.Description", "AssignedGroup.Type", "AssignedGroup.Users", "AssignedGroup.SID", "AssignedGroup.source",
                                                   "AssignedUser.Name", "AssignedUser.DisplayName", "AssignedUser.Description", "AssignedUser.Company", "AssignedUser.Department", "AssignedUser.SID", "AssignedUser.source"}}
         }

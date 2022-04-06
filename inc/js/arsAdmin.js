@@ -237,7 +237,7 @@ function arsAdmAccountsInit() {
                                     event.stopPropagation();
                                     arsCwData.toggleFlag(rowData.SID, 2);
                                 }
-                            ).prop('checked', ((rowData.flags & 1) == 1) ? true : false)
+                            ).prop('checked', ((rowData.Flags & 1) == 1) ? true : false)
                         )                 
                     );
                 },
@@ -256,7 +256,7 @@ function arsAdmAccountsInit() {
                                     event.stopPropagation();
                                     arsCwData.toggleFlag(rowData.SID, 1);
                                 }
-                            ).prop('checked', ((rowData.flags & 256) == 256) ? true : false)
+                            ).prop('checked', ((rowData.Flags & 256) == 256) ? true : false)
                         )
                     );
                 },
@@ -916,7 +916,7 @@ function arsAdmAssignmentInit() {
                 arsCwData.toggleFlag(rowData.aID, o, n);
             })
 
-            if ((rowData.flags & o) == o) {
+            if ((rowData.Flags & o) == o) {
 
                 n.prop('checked', true);
             }
