@@ -389,7 +389,9 @@ Namespace Ars
 
             User.ldap.LoadLdapUser(_Accounts)
 
-            Return _Accounts
+            Return _Accounts.FindAll(
+                            Function(a) a.Name IsNot Nothing)
+
         End Function
 
         Public Function RemoveUser(_uSID As String) As Integer
